@@ -71,12 +71,12 @@ class GrampsjsAppBar extends GrampsjsAppStateMixin(LitElement) {
         <mwc-icon slot="graphic">home</mwc-icon>
       </grampsjs-list-item>
       <grampsjs-list-item
-        href="${BASE_DIR}/blog"
+        href="${BASE_DIR}/books"
         graphic="icon"
-        ?selected="${this.appState.path.page === 'blog'}"
+        ?selected="${this.appState.path.page === 'books'}"
       >
-        <span>${this._('Blog')}</span>
-        <mwc-icon slot="graphic">rss_feed</mwc-icon>
+        <span>${this._('Библиотека')}</span>
+        <mwc-icon slot="graphic">library_books</mwc-icon>
       </grampsjs-list-item>
       <grampsjs-list-item
         href="${BASE_DIR}/people"
@@ -201,6 +201,14 @@ class GrampsjsAppBar extends GrampsjsAppStateMixin(LitElement) {
       >
         <span>${this._('_Reports').replace('_', '')}</span>
         <mwc-icon slot="graphic">menu_book</mwc-icon>
+      </grampsjs-list-item>
+      <grampsjs-list-item
+        href="${BASE_DIR}/blog"
+        graphic="icon"
+        ?selected="${this.appState.path.page === 'blog'}"
+      >
+        <span>${this._('Blog')}</span>
+        <mwc-icon slot="graphic">rss_feed</mwc-icon>
       </grampsjs-list-item>
       ${this.appState.permissions.canViewPrivate
         ? html`

@@ -6,8 +6,8 @@ import '../components/GrampsjsTreeChart.js'
 export class GrampsjsViewHourglassChart extends GrampsjsViewTreeChartBase {
   constructor() {
     super()
-    this.nAnc = 2
-    this.nDesc = 1
+    this.nAnc = 15
+    this.nDesc = 15
     this._setAnc = true
     this._setDesc = true
   }

@@ -38,6 +38,7 @@ export default merge(baseConfig, {
         {src: './images/**/*', dest: 'dist/images'},
         {src: './fonts/**/*', dest: 'dist/fonts'},
         {src: './lang/*', dest: 'dist/lang'},
+        {src: './static/**/*', dest: 'dist/static'},
       ],
     }),
     replace({

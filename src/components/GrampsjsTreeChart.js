@@ -45,8 +45,8 @@ class GrampsjsTreeChart extends GrampsjsChartBase {
   constructor() {
     super()
     this.grampsId = ''
-    this.nAnc = 5
-    this.nDesc = 5
+    this.nAnc = 15
+    this.nDesc = 15
     this.gapX = 30
   }
 

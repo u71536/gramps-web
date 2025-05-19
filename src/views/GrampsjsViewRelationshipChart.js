@@ -17,14 +17,14 @@ export class GrampsjsViewRelationshipChart extends GrampsjsViewTreeChartBase {
 
   constructor() {
     super()
-    this.nAnc = 2
+    this.nAnc = 15
     this._setSep = true
     this._setMaxImages = true
     this.color = ''
   }
 
   _resetLevels() {
-    this.nAnc = 2
+    this.nAnc = 15
   }
 
   _getPersonRules(grampsId) {

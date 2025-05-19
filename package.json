@@ -75,8 +75,8 @@
       "@babel/plugin-syntax-import-assertions"
     ]
   },
-  "name": "gramps-js",
-  "version": "25.5.1",
+  "name": "gramps-web-new",
+  "version": "1.0.0",
   "description": "The frontend for the Gramps Web genealogical research system.",
   "author": "David M. Straub",
   "license": "AGPL",

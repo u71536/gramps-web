@@ -88,10 +88,10 @@ export class GrampsjsViewTree extends GrampsjsView {
     }
     return html`
       <div id="tabs">${this.renderTabs()}</div>
-      ${this._currentTabId === 0 ? this._renderPedigree() : ''}
+      ${this._currentTabId === 0 ? this._renderRelationshipChart() : ''}
       ${this._currentTabId === 1 ? this._renderDescendantTree() : ''}
       ${this._currentTabId === 2 ? this._renderHourglassTree() : ''}
-      ${this._currentTabId === 3 ? this._renderRelationshipChart() : ''}
+      ${this._currentTabId === 3 ? this._renderPedigree() : ''}
       ${this._currentTabId === 4 ? this._renderFan() : ''}
     `
   }
@@ -104,7 +104,7 @@ export class GrampsjsViewTree extends GrampsjsView {
             this._currentTabId = 0
           }}
           has-icon
-          >${this._('Ancestor Tree')}
+          >${this._('Relationship Graph')}
           <span slot="icon"
             >${renderIconSvg(
               mdiFamilyTree,
@@ -141,7 +141,7 @@ export class GrampsjsViewTree extends GrampsjsView {
           }}
           has-icon
         >
-          ${this._('Relationship Graph')}
+          ${this._('Ancestor Tree')}
           <span slot="icon"
             >${renderIconSvg(
               relationshipGraphIconPath,

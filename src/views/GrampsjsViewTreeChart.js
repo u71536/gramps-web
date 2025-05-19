@@ -6,13 +6,14 @@ import '../components/GrampsjsTreeChart.js'
 export class GrampsjsViewTreeChart extends GrampsjsViewTreeChartBase {
   constructor() {
     super()
-    this.nAnc = 3
-    this.nDesc = 1
+    this.nAnc = 15
+    this.nDesc = 15
     this._setAnc = true
   }
 
   _resetLevels() {
-    this.nAnc = 3
+    this.nAnc = 15
+    this.nDesc = 15
   }
 
   renderChart() {

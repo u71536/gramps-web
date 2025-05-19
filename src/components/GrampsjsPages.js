@@ -55,6 +55,7 @@ import '../views/GrampsjsViewNewRepository.js'
 import '../views/GrampsjsViewNewNote.js'
 import '../views/GrampsjsViewNewMedia.js'
 import '../views/GrampsjsViewNewTask.js'
+import '../views/GrampsjsViewBooks.js'
 
 class GrampsjsPages extends GrampsjsAppStateMixin(LitElement) {
   static get styles() {
@@ -380,6 +381,11 @@ class GrampsjsPages extends GrampsjsAppStateMixin(LitElement) {
         grampsId="${this.appState.path.pageId}"
         .appState="${this.appState}"
       ></grampsjs-view-task>
+      <grampsjs-view-books
+        class="page"
+        ?active=${this.appState.path.page === 'books'}
+        .appState="${this.appState}"
+      ></grampsjs-view-books>
     `
   }
 }

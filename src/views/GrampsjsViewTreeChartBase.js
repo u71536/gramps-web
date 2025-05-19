@@ -68,8 +68,8 @@ export class GrampsjsViewTreeChartBase extends GrampsjsView {
   constructor() {
     super()
     this.grampsId = ''
-    this.nAnc = 3
-    this.nDesc = 1
+    this.nAnc = 15
+    this.nDesc = 15
     this.nMaxImages = 50
     this.nameDisplayFormat = chartNameDisplayFormat.surnameThenGiven
     this.disableBack = false

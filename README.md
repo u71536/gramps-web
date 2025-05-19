@@ -67,3 +67,15 @@ We'd love your feedback and contributions! Star this repository, fork it, and jo
 ## Reporting issues
 
 Note that this Github repository contains the source code of the Gramps Web user interface (frontend). For issues with the server-side code, please see the [Gramps Web API](https://github.com/gramps-project/gramps-web-api) (backend) repository. See [Get Help](https://www.grampsweb.org/help/help/) for more details.
+
+
+1. Внести правки
+2. npm run build
+3. docker build -t ghcr.io/u71536/gramps-web-new:ВЕРСИЯ . 106
+4. docker push ghcr.io/u71536/gramps-web-new:ВЕРСИЯ
+5. Зайти на сервер
+6. cd /opt/gramps-web-test
+7. docker-compose -f docker-compose.test.yml down
+8. nano docker-compose.test.yml
+9. Заменить строку image: ghcr.io/u71536/gramps-web-new:ВЕРСИЯ
+10. docker-compose -f docker-compose.test.yml up -d
