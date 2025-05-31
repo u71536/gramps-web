@@ -45,7 +45,7 @@ export class GrampsjsHomePerson extends GrampsjsAppStateMixin(LitElement) {
     super.connectedCallback()
     // Set default home person ID if none is set in settings
     if (!this.appState.settings?.homePerson) {
-      const defaultHomePersonId = 'I2303'
+      const defaultHomePersonId = 'I0148'
       this.appState.updateSettings({homePerson: defaultHomePersonId}, true)
       this.homePersonGrampsId = defaultHomePersonId
     } else {

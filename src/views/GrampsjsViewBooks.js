@@ -52,44 +52,6 @@ export class GrampsjsViewBooks extends GrampsjsView {
           color: #666;
           text-align: center;
         }
-        #pdfViewer {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: white;
-          z-index: 1000;
-          display: none;
-        }
-        #pdfViewer.active {
-          display: block;
-        }
-        .close-button {
-          position: fixed;
-          top: 20px;
-          right: 20px;
-          z-index: 1001;
-          background: white;
-          border: none;
-          border-radius: 50%;
-          width: 40px;
-          height: 40px;
-          cursor: pointer;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        .loading {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background: rgba(255, 255, 255, 0.8);
-          z-index: 1002;
-        }
       `,
     ]
   }
@@ -97,9 +59,6 @@ export class GrampsjsViewBooks extends GrampsjsView {
   static get properties() {
     return {
       books: {type: Array},
-      currentBook: {type: Object},
-      showPdfViewer: {type: Boolean},
-      pdfLoaded: {type: Boolean},
     }
   }
 
@@ -109,32 +68,29 @@ export class GrampsjsViewBooks extends GrampsjsView {
       {
         id: 1,
         title: 'В аду места не было',
-        author: 'Аристакесян Дживан',
+        author: 'Dzhivan Aristakesian',
         description:
           'Все, что я написал, сказал, — спасенные из ада прошлого крохи и частицы, свидетельства моей жизни и жизни народа. Ведь я не раз обречен был исчезнуть, мое существование не должно было продлиться долго — но случилось чудо, и я в состоянии письменно свидетельствовать обо всем, что было. Тем самым я становлюсь правдивым, чистым и полноводным первоисточником. Но уже невозможно упорядочить мои записи согласно последовательности событий, мест и дат.',
-        cover: '/static/img/18574939.webp',
-        pdf: '/static/books/книга.pdf',
+        cover: 'images/image.jpg',
+        link: 'https://drive.google.com/file/d/1QoQfYFk73uJbTNKzvtl2KN_MygL_8feC/view?usp=sharing',
       },
       {
         id: 2,
-        title: 'Книга 2',
-        author: 'Автор 2',
-        description: 'Описание второй книги',
-        cover: '/static/img/book2.jpg',
-        pdf: '/static/books/book2.pdf',
+        title: 'Ջիվան_գիրք',
+        author: 'Dzhivan Aristakesian',
+        description: 'Չափածո ստեղծագործություններ',
+        cover: 'images/image2.jpg',
+        link: 'https://drive.google.com/file/d/1W2LWXIVg_84GXHwawui0Rx98yEscsysE/view?usp=sharing',
       },
       {
         id: 3,
-        title: 'Книга 3',
-        author: 'Автор 3',
-        description: 'Описание третьей книги',
-        cover: '/static/img/book3.jpg',
-        pdf: '/static/books/book3.pdf',
+        title: 'Հաստատելու համար',
+        author: 'Dzhivan Aristakesian',
+        description: 'Չափածո ստեղծագործություններ',
+        cover: 'images/image3.jpg',
+        link: 'https://drive.google.com/file/d/1dZjLy-YKURjGX714OfeclfS_tIgL6Sbt/view?usp=sharing',
       },
     ]
-    this.currentBook = null
-    this.showPdfViewer = false
-    this.pdfLoaded = false
   }
 
   render() {
@@ -158,102 +114,18 @@ export class GrampsjsViewBooks extends GrampsjsView {
           `
         )}
       </div>
-      <div id="pdfViewer" class="${this.showPdfViewer ? 'active' : ''}">
-        <button class="close-button" @click=${this._closePdfViewer}>✕</button>
-        ${this.currentBook
-          ? html`
-              <iframe
-                src="${this.currentBook.pdf}"
-                title="Book Viewer"
-                @load=${this._handleIframeLoad}
-                width="100%"
-                height="100%"
-                frameborder="0"
-              ></iframe>
-              ${!this.pdfLoaded
-                ? html`<div class="loading">Loading PDF...</div>`
-                : ''}
-            `
-          : ''}
-      </div>
     `
   }
 
+  // eslint-disable-next-line class-methods-use-this
   _openBook(book) {
-    this.currentBook = book
-    this.showPdfViewer = true
-    this.pdfLoaded = false
-    // Сохраняем прогресс чтения
-    const readingProgress = {
-      bookId: book.id,
-      timestamp: new Date().toISOString(),
-      position: 0, // Начальная позиция
-    }
-    localStorage.setItem(
-      `book_progress_${book.id}`,
-      JSON.stringify(readingProgress)
-    )
-  }
-
-  _closePdfViewer() {
-    this.showPdfViewer = false
-    this.currentBook = null
+    window.open(book.link, '_blank')
   }
 
   _handleKeyDown(event, book) {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
       this._openBook(book)
-    }
-  }
-
-  _handleIframeLoad() {
-    this.pdfLoaded = true
-    // Восстанавливаем позицию чтения, если она есть
-    if (this.currentBook) {
-      const savedProgress = localStorage.getItem(
-        `book_progress_${this.currentBook.id}`
-      )
-      if (savedProgress) {
-        const progress = JSON.parse(savedProgress)
-        // Отправляем сообщение в iframe для восстановления позиции
-        const iframe = this.shadowRoot.querySelector('iframe')
-        if (iframe && iframe.contentWindow) {
-          iframe.contentWindow.postMessage(
-            {
-              type: 'restorePosition',
-              position: progress.position || 0,
-            },
-            '*'
-          )
-        }
-      }
-    }
-  }
-
-  // Добавляем обработчик сообщений от iframe
-  connectedCallback() {
-    super.connectedCallback()
-    window.addEventListener('message', this._handlePdfMessage.bind(this))
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback()
-    window.removeEventListener('message', this._handlePdfMessage.bind(this))
-  }
-
-  _handlePdfMessage(event) {
-    if (event.data.type === 'positionChanged' && this.currentBook) {
-      // Обновляем сохраненную позицию
-      const readingProgress = {
-        bookId: this.currentBook.id,
-        timestamp: new Date().toISOString(),
-        position: event.data.position,
-      }
-      localStorage.setItem(
-        `book_progress_${this.currentBook.id}`,
-        JSON.stringify(readingProgress)
-      )
     }
   }
 }

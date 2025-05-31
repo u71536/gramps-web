@@ -12,7 +12,7 @@ export class GrampsjsView extends GrampsjsAppStateMixin(LitElement) {
       sharedStyles,
       css`
         :host {
-          margin: 25px 40px;
+          margin: 25px 39px;
           background-color: #ffffff;
           --mdc-list-side-padding: 16px;
         }

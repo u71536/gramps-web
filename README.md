@@ -71,7 +71,7 @@ Note that this Github repository contains the source code of the Gramps Web user
 
 1. Внести правки
 2. npm run build
-3. docker build -t ghcr.io/u71536/gramps-web-new:ВЕРСИЯ . 106
+3. docker build -t ghcr.io/u71536/gramps-web-new:ВЕРСИЯ . 160
 4. docker push ghcr.io/u71536/gramps-web-new:ВЕРСИЯ
 5. Зайти на сервер
 6. cd /opt/gramps-web-test
@@ -79,3 +79,6 @@ Note that this Github repository contains the source code of the Gramps Web user
 8. nano docker-compose.test.yml
 9. Заменить строку image: ghcr.io/u71536/gramps-web-new:ВЕРСИЯ
 10. docker-compose -f docker-compose.test.yml up -d
+11. Если добавил новую книгу или картинку сделать
+      docker cp grampsweb_test:/app/static/img/. /opt/gramps-web-test/static/img/
+      docker cp grampsweb_test:/app/static/books/. /opt/gramps-web-test/static/books/

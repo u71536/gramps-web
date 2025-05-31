@@ -20,3 +20,7 @@
 /_site/
 /dist/
 /out-tsc/
+
+# docker
+docker-compose.yml
+docker-compose.test.yml
