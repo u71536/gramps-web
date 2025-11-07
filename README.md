@@ -71,11 +71,11 @@ Note that this Github repository contains the source code of the Gramps Web user
 
 1. Внести правки
 2. npm run build
-3. docker build -t ghcr.io/u71536/gramps-web-new:ВЕРСИЯ . 106
+3. docker build -t ghcr.io/u71536/gramps-web-new:ВЕРСИЯ . 160
 4. docker push ghcr.io/u71536/gramps-web-new:ВЕРСИЯ
 5. Зайти на сервер
-6. cd /opt/gramps-web-test
-7. docker-compose -f docker-compose.test.yml down
-8. nano docker-compose.test.yml
+6. cd /opt/grampsweb
+7. docker-compose -f docker-compose.yml down
+8. nano docker-compose.yml
 9. Заменить строку image: ghcr.io/u71536/gramps-web-new:ВЕРСИЯ
-10. docker-compose -f docker-compose.test.yml up -d
+10. docker-compose -f docker-compose.yml up -d

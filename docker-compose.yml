@@ -1,57 +1,32 @@
-# docker-compose file for frontend development
-# do not use in production!
-# https://www.grampsweb.org/dev-frontend/setup/
-
-version: "3.8"
-
-services:
-  gramps-proxy:
-    image: nginx
-    container_name: gramps-proxy-dev
-    volumes:
-      - ./dev/nginx.conf:/etc/nginx/nginx.conf
-    ports:
-      - "5555:80"
-  gramps-api:
-    container_name: gramps-api-dev
-    build:
-      context: ./dev
-      dockerfile: Dockerfile.api
-  gramps-frontend:
-    container_name: gramps-frontend-dev
-    build:
-      context: .
-      dockerfile: ./dev/Dockerfile.frontend
-    volumes:
-      - ./:/app
-      - node_modules:/app/node_modules
-
-volumes:
-  gramps_users:
-  gramps_db:
-  node_modules:
-
 services:
   grampsweb: &grampsweb
     container_name: grampsweb
-    image: ghcr.io/gramps-project/grampsweb:latest
+    image: ghcr.io/u71536/gramps-web-new:1.6.0
     restart: always
+    command: gunicorn -w 8 -b 0.0.0.0:5001 gramps_webapi.wsgi:app --timeout 120 --limit-request-line 8190
     environment: &grampsweb-env
       GRAMPSWEB_TREE: "Gramps Web"
-      VIRTUAL_PORT: "5000"
-      VIRTUAL_HOST: familytree.rstak.co
-      LETSENCRYPT_HOST: familytree.rstak.co
-      LETSENCRYPT_EMAIL: your-email@example.com
+      PORT: "5001"
       GRAMPSWEB_CELERY_CONFIG__broker_url: "redis://grampsweb_redis:6379/0"
       GRAMPSWEB_CELERY_CONFIG__result_backend: "redis://grampsweb_redis:6379/0"
       GRAMPSWEB_RATELIMIT_STORAGE_URI: redis://grampsweb_redis:6379/1
       # SMTP Settings
       GRAMPSWEB_EMAIL_HOST: "mail.smtp2go.com"
-      GRAMPSWEB_EMAIL_PORT: "587"
+      GRAMPSWEB_EMAIL_PORT: "8465"
       GRAMPSWEB_EMAIL_HOST_USER: "rstak.co"
       GRAMPSWEB_EMAIL_HOST_PASSWORD: "8Z71sMNzgFCRsCaN"
       GRAMPSWEB_DEFAULT_FROM_EMAIL: "noreply@rstak.co"
-      GRAMPSWEB_EMAIL_USE_TLS: "True"
+      GRAMPSWEB_EMAIL_USE_TLS: "true"
+    expose:
+      - "5001"
+    # Healthcheck для правильного порядка запуска (celery будет ждать, пока grampsweb станет healthy)
+    # Увеличиваем start_period, так как миграции БД могут занять время
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c 'import socket; s=socket.socket(); s.settimeout(2); result=s.connect_ex((\"localhost\", 5001)); s.close(); exit(0 if result == 0 else 1)' || exit 0"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
     volumes:
       - gramps_users:/app/users
       - gramps_index:/app/indexdir
@@ -61,22 +36,50 @@ services:
       - gramps_db:/root/.gramps/grampsdb
       - gramps_media:/app/media
       - gramps_tmp:/tmp
+      # - ./static:/app/static
     networks:
-      - proxy-tier
+      - traefik-network
       - default
+    labels:
+      # Traefik labels для автоматического обнаружения
+      - "traefik.enable=true"
+      # HTTPS Router
+      - "traefik.http.routers.grampsweb.rule=Host(`familytree.rstak.co`)"
+      - "traefik.http.routers.grampsweb.entrypoints=websecure"
+      - "traefik.http.routers.grampsweb.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.grampsweb.service=grampsweb"
+      # HTTP -> HTTPS redirect middleware (уникальное имя, чтобы избежать конфликта)
+      - "traefik.http.middlewares.grampsweb-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.grampsweb-redirect.redirectscheme.permanent=true"
+      # HTTP Router для редиректа
+      - "traefik.http.routers.grampsweb-http.rule=Host(`familytree.rstak.co`)"
+      - "traefik.http.routers.grampsweb-http.entrypoints=web"
+      - "traefik.http.routers.grampsweb-http.middlewares=grampsweb-redirect"
+      # Service
+      - "traefik.http.services.grampsweb.loadbalancer.server.port=5001"
+      # Middleware для больших загрузок (100MB)
+      - "traefik.http.middlewares.grampsweb-upload.buffering.maxRequestBodyBytes=104857600"
+      - "traefik.http.routers.grampsweb.middlewares=grampsweb-upload"
+      # WebSocket support
+      - "traefik.http.services.grampsweb.loadbalancer.server.scheme=http"
+      # Headers для правильной работы с HTTPS
+      - "traefik.http.middlewares.grampsweb-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.grampsweb.middlewares=grampsweb-headers,grampsweb-upload"
 
   grampsweb_celery:
     <<: *grampsweb
     container_name: grampsweb_celery
     depends_on:
-      - grampsweb_redis
+      grampsweb_redis:
+        condition: service_started
+      grampsweb:
+        condition: service_started
     environment:
       <<: *grampsweb-env
-      VIRTUAL_PORT: ""
-      VIRTUAL_HOST: ""
-      LETSENCRYPT_HOST: ""
-      LETSENCRYPT_EMAIL: ""
     command: celery -A gramps_webapi.celery worker --loglevel=INFO --concurrency=2
+    labels:
+      # Celery не нужен в Traefik
+      - "traefik.enable=false"
 
   grampsweb_redis:
     image: docker.io/library/redis:7.2.4-alpine
@@ -84,51 +87,10 @@ services:
     restart: always
     networks:
       - default
-
-  proxy:
-    image: docker.io/nginxproxy/nginx-proxy
-    container_name: nginx-proxy
-    restart: always
-    ports:
-      - 80:80
-      - 443:443
-    environment:
-      ENABLE_IPV6: "true"
-    volumes:
-      - ./nginx_proxy.conf:/etc/nginx/conf.d/my_proxy.conf:ro
-      - conf:/etc/nginx/conf.d
-      - dhparam:/etc/nginx/dhparam
-      - certs:/etc/nginx/certs:ro
-      - vhost.d:/etc/nginx/vhost.d
-      - html:/usr/share/nginx/html
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-    networks:
-      - proxy-tier
-
-  acme-companion:
-    image: docker.io/nginxproxy/acme-companion
-    container_name: nginx-proxy-acme
-    restart: always
-    environment:
-      NGINX_PROXY_CONTAINER: nginx-proxy
-    volumes:
-      - certs:/etc/nginx/certs:rw
-      - vhost.d:/etc/nginx/vhost.d
-      - html:/usr/share/nginx/html
-      - acme:/etc/acme.sh
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-      - proxy-tier
-    depends_on:
-      - proxy
+    labels:
+      - "traefik.enable=false"
 
 volumes:
-  acme:
-  certs:
-  conf:
-  dhparam:
-  vhost.d:
-  html:
   gramps_users:
   gramps_index:
   gramps_thumb_cache:
@@ -139,4 +101,7 @@ volumes:
   gramps_tmp:
 
 networks:
-  proxy-tier:
+  traefik-network:
+    external: true
+  default:
+
