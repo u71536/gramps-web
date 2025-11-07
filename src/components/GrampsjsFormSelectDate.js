@@ -51,8 +51,10 @@ class GrampsjsFormSelectDate extends GrampsjsAppStateMixin(LitElement) {
         }
 
         mwc-icon-button {
-          color: rgba(0, 0, 0, 0.5);
-          --mdc-theme-text-disabled-on-light: rgba(0, 0, 0, 0.25);
+          color: var(--grampsjs-body-font-color-50);
+          --mdc-theme-text-disabled-on-light: var(
+            --grampsjs-body-font-color-25
+          );
         }
 
         span.dateform {
@@ -86,6 +88,7 @@ class GrampsjsFormSelectDate extends GrampsjsAppStateMixin(LitElement) {
         id="select-modifier"
         label="${this._('Type')}"
         @change="${this.handleType}"
+        fixedMenuPosition
       >
         ${Object.keys(modifiers).map(
           modifier => html`
@@ -105,6 +108,7 @@ class GrampsjsFormSelectDate extends GrampsjsAppStateMixin(LitElement) {
         id="select-quality"
         label="${this._('Quality')}"
         @change="${this.handleQuality}"
+        fixedMenuPosition
       >
         ${Object.keys(qualifiers).map(
           qualifier => html`
@@ -135,6 +139,7 @@ class GrampsjsFormSelectDate extends GrampsjsAppStateMixin(LitElement) {
         id="month1"
         label="${this._('Month')}"
         style="width: 6em;"
+        fixedMenuPosition
       >${[...Array(13).keys()].map(
         idx => html`
           <mwc-list-item
@@ -154,6 +159,7 @@ class GrampsjsFormSelectDate extends GrampsjsAppStateMixin(LitElement) {
         id="day1"
         label="${this._('Day')}"
         style="width: 6em;"
+        fixedMenuPosition
       >${[...Array(32).keys()].map(
         idx => html`
           <mwc-list-item
@@ -203,6 +209,7 @@ class GrampsjsFormSelectDate extends GrampsjsAppStateMixin(LitElement) {
         id="month2"
         label="${this._('Month')}"
         style="width: 6em;"
+        fixedMenuPosition
       >${[...Array(13).keys()].map(
         idx => html`
           <mwc-list-item
@@ -222,6 +229,7 @@ class GrampsjsFormSelectDate extends GrampsjsAppStateMixin(LitElement) {
         id="day2"
         label="${this._('Day')}"
         style="width: 6em;"
+        fixedMenuPosition
       >${[...Array(32).keys()].map(
         idx => html`
           <mwc-list-item

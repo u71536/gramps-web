@@ -260,6 +260,14 @@ export class GrampsjsViewObject extends GrampsjsView {
         this._className,
         'placeref_list'
       )
+    } else if (e.detail.action === 'updatePlaceRef') {
+      this.updateObjectByIndex(
+        e.detail.index,
+        e.detail.data,
+        this._data,
+        this._className,
+        'placeref_list'
+      )
     } else if (e.detail.action === 'addChildRef') {
       this.addObject(
         e.detail.data,
@@ -452,6 +460,23 @@ export class GrampsjsViewObject extends GrampsjsView {
       )
     } else if (e.detail.action === 'updateName') {
       this.updateName(e.detail.data, this._data)
+    } else if (e.detail.action === 'addPlaceName') {
+      this.addObject(e.detail.data, this._data, this._className, 'alt_names')
+    } else if (e.detail.action === 'updatePlaceName') {
+      this.updateObjectByIndex(
+        e.detail.index,
+        e.detail.data,
+        this._data,
+        this._className,
+        'alt_names'
+      )
+    } else if (e.detail.action === 'delPlaceName') {
+      this.delObjectByIndex(
+        e.detail.index,
+        this._data,
+        this._className,
+        'alt_names'
+      )
     } else if (e.detail.action === 'delChildRef') {
       this.delObject(
         e.detail.handle,
@@ -633,7 +658,7 @@ export class GrampsjsViewObject extends GrampsjsView {
   }
 
   // add an object to a list of objects
-  // e.g. an event references to the event_ref_list
+  // e.g. an event reference to the event_ref_list
   addObject(data, obj, objType, prop) {
     return this._updateObject(obj, objType, _obj => {
       _obj[prop] = [..._obj[prop], data]

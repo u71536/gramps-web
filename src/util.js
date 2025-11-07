@@ -148,7 +148,7 @@ export function showObject(type, obj, strings) {
       return html`
         <mwc-icon class="inline">event</mwc-icon>
         <a href="${BASE_DIR}/${type}/${obj.gramps_id}"
-          >${eventTitleFromProfile(obj.profile || {}, strings) || obj.type}
+          >${eventTitleFromProfile(obj.profile || {}) || obj.type}
         </a>
       `
     case 'place':
@@ -226,6 +226,88 @@ export const objectTypeToEndpoint = {
   tag: 'tags',
 }
 
+const eventTypeStrings = {
+  '-1': 'Unknown',
+  0: 'Custom',
+  1: 'Marriage',
+  2: 'Marriage Settlement',
+  3: 'Marriage License',
+  4: 'Marriage Contract',
+  5: 'Marriage Banns',
+  6: 'Engagement',
+  7: 'Divorce',
+  8: 'Divorce Filing',
+  9: 'Annulment',
+  10: 'Alternate Marriage',
+  11: 'Adopted',
+  12: 'Birth',
+  13: 'Death',
+  14: 'Adult Christening',
+  15: 'Baptism',
+  16: 'Bar Mitzvah',
+  17: 'Bas Mitzvah',
+  18: 'Blessing',
+  19: 'Burial',
+  20: 'Cause Of Death',
+  21: 'Census',
+  22: 'Christening',
+  23: 'Confirmation',
+  24: 'Cremation',
+  25: 'Degree',
+  26: 'Education',
+  27: 'Elected',
+  28: 'Emigration',
+  29: 'First Communion',
+  30: 'Immigration',
+  31: 'Graduation',
+  32: 'Medical Information',
+  33: 'Military Service',
+  34: 'Naturalization',
+  35: 'Nobility Title',
+  36: 'Number of Marriages',
+  37: 'Occupation',
+  38: 'Ordination',
+  39: 'Probate',
+  40: 'Property',
+  41: 'Religion',
+  42: 'Residence',
+  43: 'Retirement',
+  44: 'Will',
+  45: 'Stillbirth',
+}
+
+const noteTypeStrings = {
+  '-1': 'Unknown',
+  0: 'Custom',
+  1: 'General',
+  2: 'Research',
+  3: 'Transcript',
+  4: 'Person Note',
+  5: 'Attribute Note',
+  6: 'Address Note',
+  7: 'Association Note',
+  8: 'LDS Note',
+  9: 'Family Note',
+  10: 'Event Note',
+  11: 'Event Reference Note',
+  12: 'Source Note',
+  13: 'Source Reference Note',
+  14: 'Place Note',
+  15: 'Repository Note',
+  16: 'Repository Reference Note',
+  17: 'Media Note',
+  18: 'Media Reference Note',
+  19: 'Child Reference Note',
+  20: 'Name Note',
+  21: 'Source text',
+  22: 'Citation',
+  23: 'Report',
+  24: 'Html code',
+  25: 'To Do',
+  26: 'Link',
+  27: 'Analysis',
+}
+
 export function objectDescription(type, obj, strings) {
   switch (type) {
     case 'person':
@@ -234,8 +316,13 @@ export function objectDescription(type, obj, strings) {
       return html`${familyTitleFromProfile(obj.profile || {}) ||
       translate(strings, 'Family')}`
     case 'event':
-      return html`${eventTitleFromProfile(obj.profile || {}, strings, false) ||
-      translate(strings, obj.type.string || obj.type)}`
+      return html`${eventTitleFromProfile(obj.profile || {}, false) ||
+      translate(
+        strings,
+        typeof obj.type === 'string'
+          ? obj.type
+          : obj.type.string || eventTypeStrings[obj.type.value] || type
+      )}`
     case 'place':
       return html`${obj?.profile?.name ||
       obj?.name?.value ||
@@ -249,7 +336,12 @@ export function objectDescription(type, obj, strings) {
     case 'repository':
       return html`${getName(obj, type) || type}`
     case 'note':
-      return html`${translate(strings, obj.type?.string ?? obj.type) || type}`
+      return html`${translate(
+        strings,
+        typeof obj.type === 'string'
+          ? obj.type
+          : obj.type.string || noteTypeStrings[obj.type.value] || type
+      )}`
     case 'media':
       return html`${getName(obj, type) || translate(strings, 'Media Object')}`
     case 'tag':
@@ -265,7 +357,7 @@ export function objectDetail(type, obj, strings) {
       return `
     ${obj?.profile?.birth?.date ? `* ${obj.profile.birth.date}` : ''}${
         obj?.profile?.birth?.place && obj?.profile?.birth?.date ? ', ' : ''
-      }${obj?.profile?.birth?.place || ''}
+      }${obj?.profile?.birth?.place_name || obj?.profile?.birth?.place || ''}
     `
     // case 'family':
     //   return ''
@@ -273,7 +365,7 @@ export function objectDetail(type, obj, strings) {
       return `
     ${obj?.profile?.date || ''}${
         obj?.profile?.place && obj?.profile?.date ? ', ' : ''
-      }${obj?.profile?.place || ''}
+      }${obj?.profile?.place_name || obj?.profile?.place || ''}
     `
     case 'place':
       return `
@@ -329,12 +421,12 @@ export function debounce(func, wait) {
   }
 }
 
-export function getNameFromProfile(obj, type, strings) {
+export function getNameFromProfile(obj, type) {
   switch (type) {
     case 'person':
       return personTitleFromProfile(obj)
     case 'event':
-      return eventTitleFromProfile(obj, strings)
+      return eventTitleFromProfile(obj)
     case 'family':
       return familyTitleFromProfile(obj)
     case 'place':
@@ -614,7 +706,10 @@ export function linkUrls(text, textOnly = true) {
     part.match(urlRegex)
       ? html`<a href="${part}" target="_blank">${part}</a>
           <md-icon class="linkicon"
-            >${renderIconSvg(mdiOpenInNew, '#0d47a1')}</md-icon
+            >${renderIconSvg(
+              mdiOpenInNew,
+              'var(--grampsjs-color-link-font)'
+            )}</md-icon
           > `
       : part
   )}`

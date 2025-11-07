@@ -51,7 +51,7 @@ export class GrampsjsMediaObject extends GrampsjsObject {
         .ocr {
           padding: 1em 1em;
           border-radius: 16px;
-          background-color: rgba(109, 76, 65, 0.12);
+          background-color: var(--grampsjs-color-shade-230);
         }
 
         .close-icon {
@@ -465,11 +465,7 @@ export class GrampsjsMediaObject extends GrampsjsObject {
           const refs = key in references ? references[key] : []
           const label =
             refs.length >= index
-              ? getNameFromProfile(
-                  refs[index] || {},
-                  key,
-                  this.appState.i18n.strings
-                )
+              ? getNameFromProfile(refs[index] || {}, key)
               : '...'
           return {
             rect: obj?.media_list?.find(mobj => mobj.ref === this.data.handle)

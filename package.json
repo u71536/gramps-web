@@ -12,7 +12,7 @@
     "storybook:build": "build-storybook",
     "build": "rimraf dist && rollup -c rollup.config.js",
     "start:build": "npm run build && web-dev-server --root-dir dist --app-index index.html --open --compatibility none",
-    "start": "web-dev-server --app-index index.html --host 0.0.0.0 --node-resolve --open --watch"
+    "start": "web-dev-server --app-index index.html --host 0.0.0.0 --node-resolve --open --watch --port 8001"
   },
   "devDependencies": {
     "@babel/core": "^7.26.8",
@@ -72,14 +72,13 @@
     ]
   },
   "name": "gramps-web-new",
-  "version": "1.0.0",
+  "version": "25.10.2",
   "description": "The frontend for the Gramps Web genealogical research system.",
   "author": "David M. Straub",
   "license": "AGPL",
   "type": "module",
   "dependencies": {
     "@hpcc-js/wasm": "^2.22.4",
-    "@maplibre/maplibre-gl-leaflet": "0.0.22",
     "@material/mwc-button": "^0.27.0",
     "@material/mwc-checkbox": "^0.27.0",
     "@material/mwc-circular-progress": "^0.27.0",
@@ -95,15 +94,12 @@
     "@material/mwc-select": "^0.27.0",
     "@material/mwc-slider": "^0.27.0",
     "@material/mwc-snackbar": "^0.27.0",
-    "@material/mwc-tab": "^0.27.0",
-    "@material/mwc-tab-bar": "^0.27.0",
     "@material/mwc-textarea": "^0.27.0",
     "@material/mwc-textfield": "^0.27.0",
     "@material/mwc-top-app-bar": "^0.27.0",
     "@material/web": "^2.2.0",
     "@mdi/js": "^7.4.47",
     "@openhistoricalmap/maplibre-gl-dates": "^1.3.0",
-    "@types/leaflet": "^1.9.16",
     "d3": "^7.9.0",
     "d3-array": "^3.2.4",
     "d3-axis": "^3.0.0",
@@ -116,9 +112,8 @@
     "dayjs": "^1.11.13",
     "jsondiffpatch": "^0.6.0",
     "jwt-decode": "^3.1.2",
-    "leaflet": "^1.9.4",
     "lit": "^3.2.1",
-    "maplibre-gl": "^4.7.1",
+    "maplibre-gl": "^5.6.0",
     "pwa-helper-components": "^0.2.10",
     "pwa-helpers": "^0.9.1",
     "tippy.js": "^6.3.7"

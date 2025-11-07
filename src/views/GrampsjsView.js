@@ -19,8 +19,7 @@ export class GrampsjsView extends GrampsjsAppStateMixin(LitElement) {
 
         @media (max-width: 768px) {
           :host {
-            margin: 25px 25px;
-            --mdc-list-side-padding: 8px;
+            margin: 25px 20px;
           }
         }
       `,

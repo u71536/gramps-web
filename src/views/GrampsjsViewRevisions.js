@@ -46,6 +46,8 @@ import '../components/GrampsjsTimedelta.js'
 
 import {GrampsjsView} from './GrampsjsView.js'
 
+import {GrampsjsStaleDataMixin} from '../mixins/GrampsjsStaleDataMixin.js'
+
 import {renderIconSvg} from '../icons.js'
 
 const changeIcons = {
@@ -81,20 +83,15 @@ const changeIcons = {
   Media_2: mdiImageMinus,
 }
 
-export class GrampsjsViewRevisions extends GrampsjsView {
+export class GrampsjsViewRevisions extends GrampsjsStaleDataMixin(
+  GrampsjsView
+) {
   static get styles() {
     return [
       super.styles,
       css`
-        md-list-item {
-          --md-list-item-label-text-weight: 350;
-          --md-list-item-label-text-size: 17px;
-          --md-list-item-supporting-text-color: rgba(0, 0, 0, 0.5);
-          --md-list-item-trailing-supporting-text-color: rgba(0, 0, 0, 0.8);
-        }
-
         md-list-item[type='text'] {
-          --md-list-item-label-text-color: rgba(0, 0, 0, 0.48);
+          --md-list-item-label-text-color: var(--grampsjs-body-font-color-48);
         }
 
         svg[slot='end'] {
@@ -105,11 +102,12 @@ export class GrampsjsViewRevisions extends GrampsjsView {
 
         md-divider {
           --md-divider-thickness: 1px;
-          --md-divider-color: rgba(0, 0, 0, 0.1);
+          --md-divider-color: var(--grampsjs-body-font-color-10);
         }
+
         .counter {
           position: relative;
-          color: white;
+          color: var(--grampsjs-color-icon);
           font-size: 11px;
           min-width: 14px;
           height: 14px;
@@ -117,7 +115,7 @@ export class GrampsjsViewRevisions extends GrampsjsView {
           left: -17px;
           top: -6px;
           font-weight: 600;
-          background-color: rgba(0, 0, 0, 0.35);
+          background-color: var(--grampsjs-color-icon-background);
           border-radius: 100px;
           display: inline-block;
           text-align: center;
@@ -177,7 +175,12 @@ export class GrampsjsViewRevisions extends GrampsjsView {
         href="${txn.changes?.length ? `/revision/${txn.id}` : ''}"
       >
         <div slot="headline">${this._(txn.description)}</div>
-        ${renderIconSvg(mdiSourceCommit, '#777777', 0, 'start')}
+        ${renderIconSvg(
+          mdiSourceCommit,
+          'var(--grampsjs-body-font-color-50)',
+          0,
+          'start'
+        )}
         ${txn.changes?.length
           ? Object.keys(counts).map(key =>
               changeIcons[key]
@@ -185,7 +188,7 @@ export class GrampsjsViewRevisions extends GrampsjsView {
                       ${
                         renderIconSvg(
                           changeIcons[key],
-                          'rgba(0, 0, 0, 0.45)',
+                          'var(--grampsjs-body-font-color-45)',
                           0,
                           'end'
                         )
@@ -196,7 +199,7 @@ export class GrampsjsViewRevisions extends GrampsjsView {
             )
           : renderIconSvg(
               mdiTimelineQuestionOutline,
-              'rgba(0, 0, 0, 0.45)',
+              'var(--grampsjs-body-font-color-45)',
               0,
               'end'
             )}
@@ -246,16 +249,15 @@ export class GrampsjsViewRevisions extends GrampsjsView {
     this._fetchData()
   }
 
+  handleUpdateStaleData() {
+    this._fetchData()
+  }
+
   update(changed) {
     super.update(changed)
     if (changed.has('_page') && changed._page !== this._page) {
       this._fetchData()
     }
-  }
-
-  connectedCallback() {
-    super.connectedCallback()
-    window.addEventListener('db:changed', () => this._fetchData())
   }
 }
 

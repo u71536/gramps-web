@@ -14,11 +14,14 @@ import {GrampsjsView} from './GrampsjsView.js'
 import '../components/GrampsjsPagination.js'
 import '../components/GrampsjsFilterChip.js'
 import '../components/GrampsjsFilters.js'
+import {GrampsjsStaleDataMixin} from '../mixins/GrampsjsStaleDataMixin.js'
 
 import {fireEvent} from '../util.js'
 import {renderIcon} from '../icons.js'
 
-export class GrampsjsViewObjectsBase extends GrampsjsView {
+export class GrampsjsViewObjectsBase extends GrampsjsStaleDataMixin(
+  GrampsjsView
+) {
   static get styles() {
     return [
       super.styles,
@@ -34,7 +37,7 @@ export class GrampsjsViewObjectsBase extends GrampsjsView {
         th {
           padding: 12px 20px;
           font-size: 13px;
-          color: #666;
+          color: var(--grampsjs-body-font-color-60);
           font-weight: 400;
           vertical-align: top;
           line-height: 24px;
@@ -54,13 +57,13 @@ export class GrampsjsViewObjectsBase extends GrampsjsView {
 
         th,
         td {
-          border-bottom: 1px solid #e0e0e0;
+          border-bottom: 1px solid var(--grampsjs-body-font-color-10);
           text-align: left;
           margin: 0;
         }
 
         table.linked tr:hover td {
-          background-color: #f0f0f0;
+          background-color: var(--grampsjs-color-shade-240);
           cursor: pointer;
         }
 
@@ -69,12 +72,12 @@ export class GrampsjsViewObjectsBase extends GrampsjsView {
         }
 
         table.linked tr.highlight:hover td {
-          background-color: white;
+          background-color: var(--grampsjs-color-shade-240);
           cursor: auto;
         }
 
         td mwc-icon.inline {
-          color: rgba(0, 0, 0, 0.25);
+          color: var(--grampsjs-body-font-color-25);
           font-size: 16px;
         }
 
@@ -271,11 +274,14 @@ export class GrampsjsViewObjectsBase extends GrampsjsView {
   _renderSortIcon(isCurrent, isAscending) {
     if (isCurrent) {
       if (isAscending) {
-        return renderIcon(mdiSortAscending, 'rgba(0, 0, 0, 0.6)')
+        return renderIcon(
+          mdiSortAscending,
+          'var(--grampsjs-body-font-color-60)'
+        )
       }
-      return renderIcon(mdiSortDescending, 'rgba(0, 0, 0, 0.6)')
+      return renderIcon(mdiSortDescending, 'var(--grampsjs-body-font-color-60)')
     }
-    return renderIcon(mdiSort, 'rgba(0, 0, 0, 0.2)')
+    return renderIcon(mdiSort, 'var(--grampsjs-body-font-color-20)')
   }
 
   _toggleSort(sortKey, isCurrent, isAscending) {
@@ -312,6 +318,10 @@ export class GrampsjsViewObjectsBase extends GrampsjsView {
     if (this._fullUrl !== this._oldUrl) {
       this._fetchData()
     }
+  }
+
+  handleUpdateStaleData() {
+    this._fetchData()
   }
 
   _fetchData() {

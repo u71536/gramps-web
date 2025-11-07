@@ -21,7 +21,7 @@ export class GrampsjsViewAdminSettings extends GrampsjsView {
         .card {
           padding: 1em 1em;
           border-radius: 16px;
-          background-color: rgba(109, 76, 65, 0.12);
+          background-color: var(--grampsjs-color-shade-230);
         }
 
         .pre {
@@ -31,7 +31,7 @@ export class GrampsjsViewAdminSettings extends GrampsjsView {
         .danger-zone {
           font-size: 16px;
           padding: 0.8em 1.4em;
-          border: 1px solid #bf360c;
+          border: 1px solid var(--grampsjs-alert-error-font-color);
           border-radius: 8px;
           display: flex;
           align-items: center;
@@ -47,8 +47,8 @@ export class GrampsjsViewAdminSettings extends GrampsjsView {
         .danger-zone div.button {
           float: right;
           order: 2;
-          --mdc-button-outline-color: #bf360c;
-          --mdc-theme-primary: #bf360c;
+          --mdc-button-outline-color: var(--grampsjs-alert-error-font-color);
+          --mdc-theme-primary: var(--grampsjs-alert-error-font-color);
         }
 
         .danger-zone p {
@@ -75,8 +75,7 @@ export class GrampsjsViewAdminSettings extends GrampsjsView {
 
   static get properties() {
     return {
-      userData: {type: Array},
-      userInfo: {type: Object},
+      _userInfo: {type: Object},
       _repairResults: {type: Object},
       _buttonUpdateSearchDisabled: {type: Boolean},
       _buttonUpdateSearchSemanticDisabled: {type: Boolean},
@@ -85,8 +84,7 @@ export class GrampsjsViewAdminSettings extends GrampsjsView {
 
   constructor() {
     super()
-    this.userData = []
-    this.userInfo = {}
+    this._userInfo = {}
     this._repairResults = {}
     this._buttonUpdateSearchDisabled = false
     this._buttonUpdateSearchSemanticDisabled = false
@@ -97,6 +95,7 @@ export class GrampsjsViewAdminSettings extends GrampsjsView {
       <h3>${this._('Usage quotas')}</h3>
 
       <grampsjs-tree-quotas .appState="${this.appState}"></grampsjs-tree-quotas>
+      <grampsjs-import .appState="${this.appState}"></grampsjs-import>
 
       <grampsjs-media-status
         .appState="${this.appState}"
@@ -106,8 +105,6 @@ export class GrampsjsViewAdminSettings extends GrampsjsView {
             .appState="${this.appState}"
           ></grampsjs-media-file-status>`
         : ''}
-
-      <grampsjs-import .appState="${this.appState}"></grampsjs-import>
 
       <grampsjs-import-media
         .appState="${this.appState}"
@@ -250,7 +247,7 @@ export class GrampsjsViewAdminSettings extends GrampsjsView {
       <grampsjs-relogin
         .appState="${this.appState}"
         @relogin="${this._openDeleteAll}"
-        username="${this.userInfo?.name || ''}"
+        username="${this._userInfo?.name || ''}"
       ></grampsjs-relogin>
     `
   }
@@ -370,6 +367,22 @@ export class GrampsjsViewAdminSettings extends GrampsjsView {
     if (info !== undefined) {
       this._repairResults = JSON.parse(info)
     }
+  }
+
+  async _fetchOwnUserDetails() {
+    const data = await this.appState.apiGet('/api/users/-/')
+    if ('error' in data) {
+      this.error = true
+      this._errorMessage = data.error
+    } else {
+      this.error = false
+      this._userInfo = data.data
+    }
+  }
+
+  connectedCallback() {
+    super.connectedCallback()
+    this._fetchOwnUserDetails()
   }
 }
 

@@ -23,10 +23,10 @@ import {renderIconSvg} from '../icons.js'
 import {clickKeyHandler} from '../util.js'
 
 const menuItems = [
-  ['User settings', '/settings/user', mdiAccountCog],
-  ['Administration', '/settings/administration', mdiWrench],
-  ['Manage users', '/settings/users', mdiAccountMultiple],
-  ['System Information', '/settings/info', mdiInformation],
+  ['User settings', '/settings/user', mdiAccountCog, false],
+  ['Administration', '/settings/administration', mdiWrench, true],
+  ['Manage users', '/settings/users', mdiAccountMultiple, true],
+  ['System Information', '/settings/info', mdiInformation, false],
 ]
 
 class GrampsjsSettingsMenu extends GrampsjsAppStateMixin(LitElement) {
@@ -36,22 +36,22 @@ class GrampsjsSettingsMenu extends GrampsjsAppStateMixin(LitElement) {
       css`
         md-menu {
           --md-divider-thickness: 1px;
-          --md-divider-color: rgba(0, 0, 0, 0.3);
+          --md-divider-color: var(--grampsjs-body-font-color-30);
         }
 
         md-menu-item {
           --md-menu-item-top-space: 0px;
           --md-menu-item-bottom-space: 0px;
           --md-menu-item-one-line-container-height: 56px;
-          --icon-color: rgba(0, 0, 0, 0.35);
+          --icon-color: var(--grampsjs-body-font-color-35);
         }
         md-menu-item.red {
-          --md-menu-item-label-text-color: var(--icon-color);
-          --icon-color: #c62828;
+          --md-menu-item-label-text-color: var(--grampsjs-logout-font-color);
+          --icon-color: var(--grampsjs-logout-font-color);
         }
         md-menu {
           --md-divider-thickness: 1px;
-          --md-divider-color: rgba(0, 0, 0, 0.3);
+          --md-divider-color: var(--grampsjs-body-font-color-30);
         }
       `,
     ]
@@ -88,7 +88,10 @@ class GrampsjsSettingsMenu extends GrampsjsAppStateMixin(LitElement) {
     `
   }
 
-  _menuItem(title, url, icon) {
+  _menuItem(title, url, icon, needsAdminPermission) {
+    if (needsAdminPermission && !this.appState.permissions.canManageUsers) {
+      return ''
+    }
     return html`
       <md-menu-item href="${url}">
         <div slot="headline">${this._(title)}</div>

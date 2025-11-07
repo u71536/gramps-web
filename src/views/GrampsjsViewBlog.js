@@ -3,13 +3,19 @@ import {css, html} from 'lit'
 import {GrampsjsView} from './GrampsjsView.js'
 import '../components/GrampsjsBlogPostPreview.js'
 
+import {GrampsjsStaleDataMixin} from '../mixins/GrampsjsStaleDataMixin.js'
+
 import {fireEvent, clickKeyHandler} from '../util.js'
 
-export class GrampsjsViewBlog extends GrampsjsView {
+export class GrampsjsViewBlog extends GrampsjsStaleDataMixin(GrampsjsView) {
   static get styles() {
     return [
       super.styles,
       css`
+        h2 {
+          margin-left: 15px;
+        }
+
         .muted {
           opacity: 0.4;
         }
@@ -26,17 +32,14 @@ export class GrampsjsViewBlog extends GrampsjsView {
         .post {
           padding: 0.8em 1em;
           cursor: pointer;
-          outline: 2px solid rgba(0, 0, 0, 0);
+          outline: 2px solid var(--grampsjs-body-font-color-0);
           transition: outline-color 0.3s ease-in;
         }
 
         .post:focus,
         .post:focus-within {
-          outline: 2px solid rgba(0, 0, 0, 0.1);
+          outline: 2px solid var(--grampsjs-body-font-color-10);
           border-radius: 5px;
-        }
-
-        .post > div {
         }
       `,
     ]
@@ -83,6 +86,7 @@ export class GrampsjsViewBlog extends GrampsjsView {
       return html``
     }
     return html`
+      <h2>${this._('Blog')}</h2>
       <div id="posts">
         ${this._dataSources.map(
           (source, i) => this.renderPost(source, this._dataNotes[i]),
@@ -133,6 +137,10 @@ export class GrampsjsViewBlog extends GrampsjsView {
 
   _handlePreviewClick(grampsId) {
     fireEvent(this, 'nav', {path: `blog/${grampsId}`})
+  }
+
+  handleUpdateStaleData() {
+    this._fetchData()
   }
 
   async _fetchData() {

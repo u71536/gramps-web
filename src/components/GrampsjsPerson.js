@@ -1,12 +1,15 @@
 import {html, css} from 'lit'
 
-import '@material/mwc-icon'
+import '@material/web/button/outlined-button'
+
+import {mdiFamilyTree, mdiDna} from '@mdi/js'
 
 import {GrampsjsObject} from './GrampsjsObject.js'
 import {asteriskIcon, crossIcon} from '../icons.js'
 import './GrampsJsImage.js'
 import './GrampsjsEditGender.js'
 import './GrampsjsPersonRelationship.js'
+import {fireEvent} from '../util.js'
 
 export class GrampsjsPerson extends GrampsjsObject {
   static get styles() {
@@ -39,7 +42,9 @@ export class GrampsjsPerson extends GrampsjsObject {
         ${this._displayName()}
       </h2>
       ${this._renderBirth()} ${this._renderDeath()} ${this._renderRelation()}
-      ${this._renderTreeBtn()}
+      <p class="button-list">
+        ${this._renderTreeBtn()} ${this._renderDnaBtn()}
+      </p>
     `
   }
 
@@ -47,11 +52,11 @@ export class GrampsjsPerson extends GrampsjsObject {
     if (!this.data.profile) {
       return ''
     }
-    const surname = this.data.profile.name_surname || html`&hellip;`
+    const surname = this.data.profile.name_surname || '…'
     const suffix = this.data.profile.name_suffix || ''
-    let given = this.data.profile.name_given || html`&hellip;`
     const call = this.data?.primary_name?.call
-    const callIndex = call ? given.search(call) : -1
+    let given = this.data.profile.name_given || call || '…'
+    const callIndex = call && call !== given ? given.search(call) : -1
     given =
       callIndex > -1
         ? html`
@@ -73,7 +78,8 @@ export class GrampsjsPerson extends GrampsjsObject {
     return html`
       <span class="event">
         <i>${asteriskIcon}</i>
-        ${obj.date || ''} ${obj.place ? this._('in') : ''} ${obj.place || ''}
+        ${obj.date || ''} ${obj.place ? this._('in') : ''}
+        ${obj.place_name || obj.place || ''}
       </span>
     `
   }
@@ -84,12 +90,11 @@ export class GrampsjsPerson extends GrampsjsObject {
       return ''
     }
     return html`
-    <span class="event">
-    <i>${crossIcon}</i>
-    ${obj.date || ''}
-      ${obj.place ? this._('in') : ''}
-      ${obj.place || ''}
-    </event>
+      <span class="event">
+        <i>${crossIcon}</i>
+        ${obj.date || ''} ${obj.place ? this._('in') : ''}
+        ${obj.place_name || obj.place || ''}
+      </span>
     `
   }
 
@@ -113,17 +118,40 @@ export class GrampsjsPerson extends GrampsjsObject {
   }
 
   _renderTreeBtn() {
-    return html` <p>
-      <mwc-button
-        outlined
-        label="${this._('Show in tree')}"
-        @click="${this._handleButtonClick}"
-      >
-      </mwc-button>
-    </p>`
+    return html`
+      <md-outlined-button @click="${this._handleTreeButtonClick}">
+        ${this._('Show in tree')}
+        <grampsjs-icon
+          path="${mdiFamilyTree}"
+          color="var(--mdc-theme-primary)"
+          slot="icon"
+        >
+        </grampsjs-icon>
+      </md-outlined-button>
+    `
   }
 
-  _handleButtonClick() {
+  _renderDnaBtn() {
+    if (!this.data?.person_ref_list?.filter(ref => ref.rel === 'DNA').length) {
+      // no DNA data
+      return ''
+    }
+    return html`
+      <md-outlined-button
+        @click="${this._handleDnaButtonClick}"
+        class="dna-btn"
+      >
+        ${this._('DNA matches')}
+        <grampsjs-icon
+          path="${mdiDna}"
+          color="var(--mdc-theme-primary)"
+          slot="icon"
+        ></grampsjs-icon>
+      </md-outlined-button>
+    `
+  }
+
+  _handleTreeButtonClick() {
     this.dispatchEvent(
       new CustomEvent('pedigree:person-selected', {
         bubbles: true,
@@ -131,13 +159,11 @@ export class GrampsjsPerson extends GrampsjsObject {
         detail: {grampsId: this.data.gramps_id},
       })
     )
-    this.dispatchEvent(
-      new CustomEvent('nav', {
-        bubbles: true,
-        composed: true,
-        detail: {path: 'tree'},
-      })
-    )
+    fireEvent(this, 'nav', {path: 'tree'})
+  }
+
+  _handleDnaButtonClick() {
+    fireEvent(this, 'nav', {path: `dna-matches/${this.data.gramps_id}`})
   }
 }
 

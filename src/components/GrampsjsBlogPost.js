@@ -14,18 +14,19 @@ export class GrampsjsBlogPost extends GrampsjsAppStateMixin(LitElement) {
       sharedStyles,
       css`
         h2 {
-          color: #222222;
-          font-weight: 300;
-          font-size: 40px;
-          padding-bottom: 0.3em;
+          color: var(--grampsjs-note-color);
+          font-weight: 530;
+          font-size: 37px;
+          padding-bottom: 0.75em;
           margin-bottom: 0.5em;
           padding-top: 0.5em;
           text-align: center;
-          border-bottom: 2px solid #222222;
+          border-bottom: 2px solid var(--grampsjs-note-color);
         }
 
         h3.author {
           font-family: var(--grampsjs-body-font-family);
+          font-weight: 300;
           font-size: 16px;
           text-transform: uppercase;
           letter-spacing: 0.15em;
@@ -56,7 +57,6 @@ export class GrampsjsBlogPost extends GrampsjsAppStateMixin(LitElement) {
           --grampsjs-note-line-height: 1.7em;
           --grampsjs-note-font-size: 18px;
           --grampsjs-note-font-family: 'EB Garamond x';
-          --grampsjs-note-color: #333;
         }
 
         #btn-details {
@@ -66,6 +66,7 @@ export class GrampsjsBlogPost extends GrampsjsAppStateMixin(LitElement) {
         @media (min-width: 768px) {
           h2 {
             font-size: 60px;
+            padding-bottom: 0.3em;
           }
 
           grampsjs-note-content {

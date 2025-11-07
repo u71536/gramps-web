@@ -21,7 +21,7 @@ export class GrampsjsViewMediaLightbox extends GrampsjsView {
           font-size: 0.85em;
           font-weight: 300;
           font-family: var(--grampsjs-body-font-family);
-          color: rgba(0, 0, 0, 0.8);
+          color: var(--grampsjs-body-font-color);
           padding-left: 0.8em;
         }
 
@@ -263,11 +263,7 @@ export class GrampsjsViewMediaLightbox extends GrampsjsView {
           const refs = key in references ? references[key] : []
           const label =
             refs.length >= index
-              ? getNameFromProfile(
-                  refs[index] || {},
-                  key,
-                  this.appState.i18n.strings
-                )
+              ? getNameFromProfile(refs[index] || {}, key)
               : '...'
           return {
             rect: obj?.media_list?.find(mobj => mobj.ref === this._data.handle)

@@ -1,11 +1,8 @@
 import {html, css, LitElement} from 'lit'
 
-import '@material/mwc-select'
-import '@material/mwc-list/mwc-list-item'
-import '@material/mwc-textarea'
-import '@material/mwc-formfield'
-import '@material/mwc-button'
-import '@material/mwc-circular-progress'
+import '@material/web/dialog/dialog.js'
+import '@material/web/button/text-button.js'
+import '@material/web/button/filled-button.js'
 
 import {sharedStyles} from '../SharedStyles.js'
 import {fireEvent, emptyDate} from '../util.js'
@@ -33,15 +30,13 @@ export class GrampsjsObjectForm extends GrampsjsAppStateMixin(LitElement) {
         }
 
         mwc-icon-button {
-          color: rgba(0, 0, 0, 0.5);
+          color: var(--grampsjs-body-font-color-50);
         }
 
-        mwc-dialog {
-          --mdc-dialog-max-width: 100vw;
-          --mdc-dialog-min-width: 50vw;
-          --mdc-dialog-content-ink-color: var(
-            --mdc-theme-text-primary-on-background
-          );
+        md-dialog {
+          max-width: 100vw;
+          min-width: 50vw;
+          max-height: 80vh;
         }
       `,
     ]
@@ -130,37 +125,24 @@ export class GrampsjsObjectForm extends GrampsjsAppStateMixin(LitElement) {
 
   render() {
     return html`
-      <mwc-dialog
-        scrimClickAction=""
-        escapeKeyAction=""
-        heading="${this.dialogTitle}"
-        open
-      >
-        <div @formdata:changed="${this._handleFormData}">
-          ${this.renderForm()}
+      <md-dialog @cancel="${this._handleDialogCancel}" open>
+        <div slot="headline">${this.dialogTitle}</div>
+        <div slot="content" @formdata:changed="${this._handleFormData}">
+          ${this.dialogIsOpen ? this.renderForm() : ''}
         </div>
-
-        <mwc-button
-          raised
-          class="edit"
-          style="margin:8px 16px 8px 8px"
-          slot="primaryAction"
-          dialogAction="ok"
-          ?disabled="${!this.isValid}"
-          @click="${this._handleDialogSave}"
-        >
-          ${this._('_Save')}
-        </mwc-button>
-        <mwc-button
-          class="edit"
-          style="margin:8px"
-          slot="secondaryAction"
-          dialogAction="cancel"
-          @click="${this._handleDialogCancel}"
-        >
-          ${this._('Cancel')}
-        </mwc-button>
-      </mwc-dialog>
+        <div slot="actions">
+          <md-text-button class="edit" @click="${this._handleDialogCancel}">
+            ${this._('Cancel')}
+          </md-text-button>
+          <md-filled-button
+            class="edit"
+            @click="${this._handleDialogSave}"
+            ?disabled="${!this.isValid}"
+          >
+            ${this._('_Save')}
+          </md-filled-button>
+        </div>
+      </md-dialog>
     `
   }
 
@@ -175,10 +157,11 @@ export class GrampsjsObjectForm extends GrampsjsAppStateMixin(LitElement) {
   }
 
   _openDialog() {
-    const dialog = this.shadowRoot.querySelector('mwc-dialog')
-    if (dialog !== null) {
-      dialog.open = true
-    }
+    this.renderRoot.querySelector('md-dialog')?.show()
+  }
+
+  get dialogIsOpen() {
+    return this.renderRoot.querySelector('md-dialog')?.open ?? false
   }
 
   open() {
@@ -280,6 +263,9 @@ export class GrampsjsObjectForm extends GrampsjsAppStateMixin(LitElement) {
     }
     if (originalTarget.id === 'match-source-list') {
       this.data = {...this.data, source_handle: e.detail.data[0]}
+    }
+    if (originalTarget.id === 'ydna-person-list') {
+      this.data = {...this.data, person_handle: e.detail.data[0]}
     }
     if (originalTarget.id === 'match-target-list') {
       this.data = {...this.data, target_handle: e.detail.data[0]}

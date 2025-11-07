@@ -27,7 +27,7 @@ class GrampsjsFormSurname extends GrampsjsAppStateMixin(LitElement) {
         }
 
         mwc-icon-button {
-          color: rgba(0, 0, 0, 0.5);
+          color: var(--grampsjs-body-font-color-50);
         }
       `,
     ]
@@ -94,8 +94,8 @@ class GrampsjsFormSurname extends GrampsjsAppStateMixin(LitElement) {
                 id="surname-origin-type"
                 .appState="${this.appState}"
                 typeName="name_origin_types"
-                defaultTypeName=""
-                initialValue=${this.data?.origintype || ''}
+                defaultValue=""
+                value=${this.data?.origintype || ''}
                 .types="${this.types}"
                 .typesLocale="${this.typesLocale}"
                 ?loadingTypes=${this.loadingTypes}

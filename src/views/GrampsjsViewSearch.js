@@ -35,14 +35,16 @@ export class GrampsjsViewSearch extends GrampsjsView {
         mwc-textfield#search-field {
           --mdc-shape-small: 28px;
           --mdc-typography-subtitle1-font-size: 22px;
-          --mdc-typography-subtitle1-font-weight: 300;
-          --mdc-text-field-idle-line-color: rgba(0, 0, 0, 0.2);
+          --mdc-typography-subtitle1-font-weight: var(
+            --grampsjs-body-font-weight
+          );
+          --mdc-text-field-idle-line-color: var(--grampsjs-body-font-color-20);
           width: calc(100% - 70px);
           margin: 30px auto;
         }
 
         #search-field-container mwc-icon-button {
-          color: rgba(0, 0, 0, 0.5);
+          color: var(--grampsjs-body-font-color-50);
           --mdc-icon-size: 26px;
           --mdc-icon-button-size: 55px;
           position: relative;
@@ -108,7 +110,7 @@ export class GrampsjsViewSearch extends GrampsjsView {
       !Object.values(this._objectTypes).some(Boolean)
         ? html`<p>${this._('Select at least one object type')}</p>`
         : ''}
-      ${this._totalCount === 0 ? html`<p>${this._('No items')}</p>` : ''}
+      ${this._totalCount === 0 ? html`<p>${this._('None')}</p>` : ''}
       ${this._totalCount > 0 ? html`<p>Total: ${this._totalCount}</p>` : ''}
       <grampsjs-search-result-list
         .data="${this._data}"

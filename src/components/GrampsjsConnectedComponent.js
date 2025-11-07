@@ -6,11 +6,12 @@ Base class for Components that fetch data when first loaded
 import {LitElement} from 'lit'
 import {GrampsjsAppStateMixin} from '../mixins/GrampsjsAppStateMixin.js'
 import {sharedStyles} from '../SharedStyles.js'
+import {GrampsjsStaleDataMixin} from '../mixins/GrampsjsStaleDataMixin.js'
 
 import {fireEvent} from '../util.js'
 
-export class GrampsjsConnectedComponent extends GrampsjsAppStateMixin(
-  LitElement
+export class GrampsjsConnectedComponent extends GrampsjsStaleDataMixin(
+  GrampsjsAppStateMixin(LitElement)
 ) {
   static get styles() {
     return [sharedStyles]
@@ -27,6 +28,7 @@ export class GrampsjsConnectedComponent extends GrampsjsAppStateMixin(
       method: {type: String},
       postData: {type: Object},
       _oldPostData: {type: Object},
+      active: {type: Boolean},
     }
   }
 
@@ -39,11 +41,11 @@ export class GrampsjsConnectedComponent extends GrampsjsAppStateMixin(
     this._errorMessage = ''
     this._data = {}
     this._oldUrl = ''
-    this._boundUpdateData = this._updateData.bind(this)
     this._boundsHandleOnline = this._handleOnline.bind(this)
     this.method = 'GET'
     this.postData = {}
     this._oldPostData = {}
+    this.active = true
   }
 
   render() {
@@ -144,15 +146,33 @@ export class GrampsjsConnectedComponent extends GrampsjsAppStateMixin(
     }
   }
 
+  handleUpdateStaleData() {
+    // reload with 0.1 second delay so the views are prioritized
+    setTimeout(() => this._updateData(), 100)
+  }
+
+  firstUpdated() {
+    // the active property, used for lazy loading of stale data, is set
+    // based on visibility of the element in the viewport
+    const observer = IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          this.active = true
+        } else {
+          this.active = false
+        }
+      })
+    })
+    observer.observe(this)
+  }
+
   connectedCallback() {
     super.connectedCallback()
-    window.addEventListener('db:changed', this._boundUpdateData)
     window.addEventListener('online', this._boundHandleOnline)
   }
 
   disconnectedCallback() {
     window.removeEventListener('online', this._boundHandleOnline)
-    window.removeEventListener('db:changed', this._boundUpdateData)
     super.disconnectedCallback()
   }
 }
